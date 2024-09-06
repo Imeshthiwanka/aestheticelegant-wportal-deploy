@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Elegant Timer</title>
+	<link rel="icon" href="illustration.png" type="image/x-icon">
+
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+            background: #000;
+        }
+
+        .background-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+            opacity: 0;
+            animation: fadeIn 2s forwards;
+        }
+
+        #bg-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(50%);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .title-background {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+            color: #f5f5f5;
+            font-size: 2.5em;
+            font-weight: 700;
+            padding: 10px 20px;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 10px;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        }
+
+        .container {
+            position: relative;
+            background: rgba(25, 25, 30, 0.5);
+            border-radius: 40px;
+            padding: 10px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 0 15px rgba(0,0,0,0.7);
+            animation: fadeIn 2s ease-in;
+            z-index: 2;
+        }
+
+        .title {
+            font-size: 2.5em;
+			font-family:Trebuchet MS;
+            margin-bottom: 20px;
+            font-weight: 400;
+            color: #f5f5f5;
+        }
+		.title2 {
+            font-size:1.7em;
+			font-family:arial;
+            margin-bottom: 20px;
+            font-weight: 400;
+            color: #f5f5f5;
+        }
+
+        .input-group {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .input-field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-field input {
+            width: 60px;
+            padding: 10px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            color: #f5f5f5;
+            outline: none;
+            text-align: center;
+            transition: background 0.3s;
+        }
+
+        .input-field input:focus {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        #control-buttons {
+            margin-top: 20px;
+        }
+
+        #control-buttons button {
+            padding: 10px 20px;
+            font-size: 1em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background: #333;
+            color: #f5f5f5;
+            margin: 5px;
+            transition: background 0.3s, transform 0.2s;
+        }
+
+        #control-buttons button:hover {
+            background: #444;
+            transform: scale(1.05);
+        }
+
+        #timers {
+            margin-top: 20px;
+        }
+
+        .timer {
+            font-size: 1.2em;
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .timer.counting {
+            color: green; /* Green color while counting */
+        }
+
+        .timer.finished {
+            color: #FF0000; /* Red color for finished timers */
+        }
+
+        .alarm-popup {
+            position: absolute;
+            top: 110%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(50, 0, 0, 0.5);
+            color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
+            display: none;
+            animation: fadeIn 2s ease-in;
+        }
+
+        footer {
+            position: absolute;
+            bottom: 0px; /* Adjusted position further down */
+            left: 0;
+            width: 100%;
+            text-align: left;
+            padding: 10px;
+            font-size: 0.8em;
+            color: rgba(255, 255, 255, 0.6);
+        }
+    </style>
+</head>
+<body>
+    <div class="background-video">
+        <video autoplay muted loop id="bg-video">
+            <source src="apple.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+
+    <div class="container">
+        <h1 class="title">The Elegant Timer</h1>
+        <h2 class="title2">Elevate Your Workflow</h2>
+
+        <div class="input-group">
+            <div class="input-field">
+                <input type="number" id="hours" min="0" max="23" placeholder="00" aria-label="Hours">
+            </div>
+            <div class="input-field">
+                <input type="number" id="minutes" min="0" max="59" placeholder="00" aria-label="Minutes">
+            </div>
+            <div class="input-field">
+                <input type="number" id="seconds" min="0" max="59" placeholder="00" aria-label="Seconds">
+            </div>
+        </div>
+
+        <div id="control-buttons">
+            <button id="start-btn" onclick="startTimers()">Start</button>
+            <button id="pause-btn" onclick="pauseTimers()">Pause</button>
+            <button id="play-btn" onclick="playTimers()">Play</button>
+            <button id="reset-btn" onclick="resetTimers()">Reset</button>
+        </div>
+
+        <div id="timers"></div>
+
+        <div id="alarm-container" class="alarm-popup">
+            <p>Time's up!</p>
+            <button id="dismiss-btn" onclick="dismissAlarm()">Dismiss</button>
+        </div>
+    </div>
+
+    <audio id="alarm-sound" src="alarm.mp3"></audio>
+
+    <footer>
+        <p><em>&copy; 2024 Designed by Imesh.</em></p>
+    </footer>
+
+    <script>
+        let alarmSound = document.getElementById("alarm-sound");
+        let timers = [];
+        let intervals = [];
+        let isPaused = false;
+
+        function startTimers() {
+            if (isPaused) {
+                isPaused = false;
+                playTimers();
+                return;
+            }
+
+            const hours = parseInt(document.getElementById("hours").value) || 0;
+            const minutes = parseInt(document.getElementById("minutes").value) || 0;
+            const seconds = parseInt(document.getElementById("seconds").value) || 0;
+
+            const baseTimeInSeconds = (hours * 3600) + (minutes * 60) + seconds;
+
+            if (baseTimeInSeconds === 0) {
+                alert("Please enter a valid time!");
+                return;
+            }
+
+            document.getElementById("timers").innerHTML = "";
+            timers = [];
+            intervals = [];
+            let currentTimer = 0;
+
+            function createNextTimer() {
+                if (currentTimer >= 5) return;
+
+                currentTimer++;
+                const timeInSeconds = baseTimeInSeconds * currentTimer;
+                const timerDiv = document.createElement("div");
+                timerDiv.id = `timer${currentTimer}`;
+                timerDiv.className = "timer counting"; // Add the counting class
+                timerDiv.textContent = `Question ${currentTimer} : ${formatTime(timeInSeconds)}`;
+                document.getElementById("timers").appendChild(timerDiv);
+
+                const targetTime = new Date().getTime() + timeInSeconds * 1000;
+                timers.push({ id: `timer${currentTimer}`, targetTime });
+
+                const interval = setInterval(() => {
+                    const currentTime = new Date().getTime();
+                    const distance = targetTime - currentTime;
+
+                    if (distance < 0) {
+                        clearInterval(interval);
+                        const timerElement = document.getElementById(`timer${currentTimer}`);
+                        timerElement.textContent = `Question ${currentTimer} : Time's up!`;
+                        timerElement.classList.remove("counting");
+                        timerElement.classList.add("finished");
+                        alarmSound.play();
+                        document.getElementById("alarm-container").classList.add("show");
+                        createNextTimer();
+                    } else {
+                        const timeLeft = Math.floor(distance / 1000);
+                        document.getElementById(`timer${currentTimer}`).textContent = `Question ${currentTimer} : ${formatTime(timeLeft)}`;
+                    }
+                }, 1000);
+
+                intervals.push(interval);
+            }
+
+            createNextTimer();
+        }
+
+        function pauseTimers() {
+            isPaused = true;
+            intervals.forEach(interval => clearInterval(interval));
+        }
+
+        function playTimers() {
+            startTimers();
+        }
+
+        function resetTimers() {
+            timers = [];
+            intervals.forEach(interval => clearInterval(interval));
+            intervals = [];
+            document.getElementById("timers").innerHTML = "";
+            document.getElementById("alarm-container").classList.remove("show");
+
+            // Clear input fields
+            document.getElementById("hours").value = "";
+            document.getElementById("minutes").value = "";
+            document.getElementById("seconds").value = "";
+        }
+
+        function dismissAlarm() {
+            document.getElementById("alarm-container").classList.remove("show");
+        }
+
+        function formatTime(seconds) {
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            const sec = Math.floor(seconds % 60);
+            return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+        }
+    </script>
+</body>
+</html>
